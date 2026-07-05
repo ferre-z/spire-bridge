@@ -3,11 +3,15 @@
 //! Phase 1 wires up the bare minimum needed to verify the dev loop:
 //!   - Tauri 2 builder with the updater plugin registered (check deferred)
 //!   - default window per `tauri.conf.json`
-//!
-//! Tasks 3+ add the SQLite store, source adapters, sync engine, and IPC
-//! commands. Keep this file lean.
+//!   - module surface for IPC commands (Task 6), sync engine (Task 5),
+//!     sources (Task 4), and store (Task 3).
 
 use tracing::info;
+
+pub mod error;
+pub mod sources;
+pub mod store;
+pub use error::{AppError, AppResult};
 
 /// Entry point invoked from `main.rs`. Boots the Tauri application.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
