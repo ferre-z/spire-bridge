@@ -1,0 +1,9 @@
+node_modules/
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/remote/
+*.log
+.DS_Store
+.vscode/
+.idea/
+src/routesTree.gen.ts
