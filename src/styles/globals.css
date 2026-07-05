@@ -1,0 +1,122 @@
+/* ============================================================
+ * Spire Bridge — Global Styles & Design Tokens
+ * ------------------------------------------------------------
+ * Tailwind v4 base layer + :root design tokens + body defaults.
+ * Tokens here are LOCKED by plan Global Constraint #8 — do not
+ * introduce new colors / opacities / radii / shadows in
+ * per-component styles; consume the CSS variables below.
+ * ============================================================ */
+
+@import "tailwindcss";
+@import "./glass.css";
+
+/* Fonts (declared via @import so Inter Variable / JetBrains Mono
+ * Variable are loaded by Vite/asset pipeline later; for now the
+ * names are reserved so the font-family fallback chain is stable
+ * even if the woff2 files aren't yet wired up.) */
+@theme {
+  --font-sans: "Inter Variable", "Inter", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace,
+    SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Locked color tokens — single source of truth. */
+  --color-bg: #0a0a0a;
+  --color-text-primary: #f5f5f5;
+  --color-text-muted: #a3a3a3;
+  --color-text-faint: #525252;
+
+  /* Accent (red) */
+  --color-accent: #ef4444;
+  --color-accent-hover: #dc2626;
+  --color-accent-highlight: #fca5a5;
+
+  /* Semantic */
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Locked radii */
+  --radius-standard: 12px;
+  --radius-card: 20px;
+  --radius-pill: 9999px;
+}
+
+:root {
+  /* ---- Color tokens (RGB-triples so rgba() helpers can compose) ---- */
+  --spire-bg: #0a0a0a;
+  --spire-fg: #f5f5f5;
+  --spire-fg-muted: #a3a3a3;
+  --spire-fg-faint: #525252;
+
+  --spire-accent: #ef4444;
+  --spire-accent-hover: #dc2626;
+  --spire-accent-highlight: #fca5a5;
+
+  --spire-success: #22c55e;
+  --spire-warning: #eab308;
+  --spire-error: #ef4444;
+  --spire-info: #3b82f6;
+
+  /* ---- Glass surface tokens (composed by .glass in glass.css) ---- */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-bg-strong: rgba(255, 255, 255, 0.06);
+  --glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.12);
+  --glass-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --glass-blur: blur(24px) saturate(140%);
+  --glass-blur-strong: blur(40px) saturate(160%);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* ---- Radius tokens ---- */
+  --spire-radius: 12px;
+  --spire-radius-card: 20px;
+  --spire-radius-pill: 9999px;
+
+  /* ---- Typography ---- */
+  --spire-font-sans: "Inter Variable", "Inter", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --spire-font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace,
+    SFMono-Regular, Menlo, Consolas, monospace;
+
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--spire-bg);
+  color: var(--spire-fg);
+  font-family: var(--spire-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(239, 68, 68, 0.4);
+  color: var(--spire-fg);
+}
+
+/* ============================================================
+ * Reduced-motion: disable every transition / animation globally
+ * (Constraint #9 + accessibility baseline).
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

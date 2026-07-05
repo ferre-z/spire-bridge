@@ -1,0 +1,62 @@
+[package]
+name = "spire-bridge"
+version = "0.1.0"
+description = "Liquid-glass cockpit unifying live data from Claude Code, OpenCode, and Hermes Agent."
+authors = ["ferre"]
+license = "MIT"
+repository = "https://github.com/ferre-z/spire-bridge"
+edition = "2021"
+rust-version = "1.83"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "spire_bridge_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.1", features = [] }
+
+[dependencies]
+tauri = { version = "2.1", features = ["tray-icon", "image-png"] }
+tauri-plugin-updater = "2"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", features = ["json", "stream"] }
+eventsource-client = "0.13"
+tokio-tungstenite = { version = "0.26", features = ["connect"] }
+
+rusqlite = { version = "0.32", features = ["bundled", "chrono"] }
+refinery = { version = "0.8", features = ["rusqlite"] }
+
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+
+keyring = "3"
+notify = "6"
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+thiserror = "1"
+anyhow = "1"
+
+parking_lot = "0.12"
+dashmap = "6"
+
+[features]
+# By default Tauri runs in development mode (uses dev URL).
+# When building for production, compile with `--release` and the beforeBuildCommand
+# produces the static frontend in `dist` (frontendDist).
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

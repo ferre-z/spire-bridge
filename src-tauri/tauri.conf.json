@@ -1,0 +1,69 @@
+{
+  "$schema": "https://schema.tauri.app/config/2.0.0",
+  "productName": "Spire Bridge",
+  "version": "0.1.0",
+  "identifier": "com.spire-bridge.app",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Spire Bridge",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "backgroundColor": "#0a0a0a",
+        "shadow": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost"
+    },
+    "trayIcon": {
+      "id": "spire-bridge-tray",
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true,
+      "tooltip": "Spire Bridge"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "DeveloperTool",
+    "shortDescription": "Liquid-glass cockpit for Claude Code, OpenCode, and Hermes Agent.",
+    "longDescription": "Spire Bridge is a premium desktop dashboard that unifies live telemetry from Claude Code, OpenCode, and Hermes Agent into a single, beautiful, read-only cockpit.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "licenseFile": "../LICENSE",
+    "copyright": "Copyright (c) 2026 ferre",
+    "publisher": "ferre",
+    "homepage": "https://github.com/ferre-z/spire-bridge"
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": ["https://github.com/ferre-z/spire-bridge/releases/latest/download/latest.json"],
+      "pubkey": "",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

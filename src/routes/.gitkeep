@@ -1,0 +1,3 @@
+# Routes directory — TanStack Router file-based.
+# Each task (8 / 9 / 10 / 11 / 12 / 13 / 14) will add its route files here.
+# Stubbed in Task 2 so the generator doesn't crash on an empty dir.

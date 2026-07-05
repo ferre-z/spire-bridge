@@ -1,0 +1,39 @@
+/* ============================================================
+ * Spire Bridge — Glass Primitives
+ * ------------------------------------------------------------
+ * Reusable, low-level glass surfaces. These are the atoms the
+ * higher-level <GlassPanel> / <GlassCard> / <GlassPill> /
+ * <GlassButton> components compose with.
+ *
+ * Every visual value here is locked by plan Global Constraint #8
+ * — do NOT invent new colors, opacities, blurs, or radii.
+ * ============================================================ */
+
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass,
+  .glass-hover {
+    transition: none !important;
+  }
+}
