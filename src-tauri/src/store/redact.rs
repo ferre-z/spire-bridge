@@ -15,7 +15,7 @@ static PATTERNS: Lazy<Vec<Regex>> = Lazy::new(|| {
         Regex::new(r"sk-[A-Za-z0-9_-]{20,}").unwrap(),
         Regex::new(r"sk-ant-[A-Za-z0-9_-]{20,}").unwrap(),
         Regex::new(r"sk-proj-[A-Za-z0-9_-]{20,}").unwrap(),
-        Regex::new(r"ghp_[A-Za-z0-9]{20,}").unwrap(),
+        Regex::new(r"ghp_[A-Za-z0-9_]{20,}").unwrap(),
         Regex::new(r"github_pat_[A-Za-z0-9_]{20,}").unwrap(),
         Regex::new(r"xoxb-[A-Za-z0-9-]{20,}").unwrap(),
         Regex::new(r"xoxp-[A-Za-z0-9-]{20,}").unwrap(),
@@ -44,13 +44,11 @@ pub fn redact_value(v: &serde_json::Value) -> serde_json::Value {
         serde_json::Value::Array(arr) => {
             serde_json::Value::Array(arr.iter().map(redact_value).collect())
         }
-        serde_json::Value::Object(obj) => {
-            serde_json::Value::Object(
-                obj.iter()
-                    .map(|(k, v)| (k.clone(), redact_value(v)))
-                    .collect(),
-            )
-        }
+        serde_json::Value::Object(obj) => serde_json::Value::Object(
+            obj.iter()
+                .map(|(k, v)| (k.clone(), redact_value(v)))
+                .collect(),
+        ),
         other => other.clone(),
     }
 }
@@ -62,31 +60,37 @@ mod tests {
     #[test]
     fn redacts_openai_key() {
         let s = "hello sk-abcdefghijklmnopqrstuv world";
-        assert!(redact(s).contains("[REDACTED]"));
+        assert!(redact(s).contains("[REDACTED]"), "got: {}", redact(s));
+        assert!(!redact(s).contains("abcdefghijklmnopqrstuv"));
     }
 
     #[test]
     fn redacts_anthropic_key() {
         let s = "config: sk-ant-api03-abcdefghijklmnopqrstuvwxyz";
-        assert!(redact(s).contains("[REDACTED]"));
+        let r = redact(s);
+        assert!(r.contains("[REDACTED]"), "got: {r}");
     }
 
     #[test]
     fn redacts_github_pat() {
         let s = "token=ghp_abcdefghijklmnopqrstuvwxyz1234";
-        assert!(redact(s).contains("[REDACTED]"));
+        let r = redact(s);
+        assert!(r.contains("[REDACTED]"), "got: {r}");
     }
 
     #[test]
     fn redacts_bearer_header() {
         let s = "Authorization: Bearer abc.def-ghi_jkl-mno";
-        assert!(redact(s).contains("[REDACTED]"));
+        let r = redact(s);
+        assert!(r.contains("[REDACTED]"), "got: {r}");
+        assert!(!r.contains("abc.def-ghi_jkl-mno"));
     }
 
     #[test]
     fn redacts_aws_access_key() {
         let s = "aws: AKIAIOSFODNN7EXAMPLE";
-        assert!(redact(s).contains("[REDACTED]"));
+        let r = redact(s);
+        assert!(r.contains("[REDACTED]"), "got: {r}");
     }
 
     #[test]
@@ -105,9 +109,12 @@ mod tests {
         });
         let redacted = redact_value(&v);
         let s = redacted.to_string();
-        assert!(s.contains("[REDACTED]"));
+        assert!(s.contains("[REDACTED]"), "got: {s}");
         // Non-secret values pass through.
         assert!(s.contains("ferre"));
         assert!(s.contains("safe text"));
+        // No raw keys remain.
+        assert!(!s.contains("sk-abcdefghijklmnopqrstuvwxyz1234"));
+        assert!(!s.contains("ghp_long_enough_token_12345"));
     }
 }

@@ -11,6 +11,7 @@ use tracing::info;
 pub mod error;
 pub mod sources;
 pub mod store;
+pub mod sync;
 pub use error::{AppError, AppResult};
 
 /// Entry point invoked from `main.rs`. Boots the Tauri application.

@@ -19,11 +19,14 @@ use parking_lot::Mutex;
 use rusqlite::{params, Connection, OptionalExtension};
 use std::path::Path;
 
+pub mod redact;
+
 /// All SQL migrations, in version order. Keep this in sync with the
 /// `migrations/` directory; we read the SQL at compile time so the store
 /// is portable without a filesystem read at runtime.
 const MIGRATION_0001: &str = include_str!("../../migrations/0001_init.sql");
 const MIGRATION_0002: &str = include_str!("../../migrations/0002_seed_sources.sql");
+const MIGRATION_0003: &str = include_str!("../../migrations/0003_sync_meta.sql");
 
 /// One row in `meta` (lazy-created). Used for sync cursors (last seq, last
 /// timestamp) per source — Task 5 leans on this.
@@ -58,6 +61,10 @@ impl Store {
             conn.execute_batch(MIGRATION_0002)?;
             conn.execute("INSERT INTO schema_version (version) VALUES (2)", [])?;
         }
+        if applied < 3 {
+            conn.execute_batch(MIGRATION_0003)?;
+            conn.execute("INSERT INTO schema_version (version) VALUES (3)", [])?;
+        }
         Ok(Self { conn: Mutex::new(conn) })
     }
 
@@ -73,6 +80,8 @@ impl Store {
         conn.execute("INSERT INTO schema_version (version) VALUES (1)", [])?;
         conn.execute_batch(MIGRATION_0002)?;
         conn.execute("INSERT INTO schema_version (version) VALUES (2)", [])?;
+        conn.execute_batch(MIGRATION_0003)?;
+        conn.execute("INSERT INTO schema_version (version) VALUES (3)", [])?;
         Ok(Self { conn: Mutex::new(conn) })
     }
 
@@ -219,6 +228,112 @@ impl Store {
             session_count,
             error_count,
         })
+    }
+
+    // -- sync_meta cursor helpers (Task 5) -----------------------------
+    //
+    // The sync engine needs to remember, per (source, session) pair, the
+    // last `seq` it persisted so the next backfill can resume. The
+    // key/value shape is intentionally generic so the engine can store
+    // arbitrary cursors without a schema change every time we add one.
+
+    /// Read a string value from `sync_meta`. Returns `None` if the key
+    /// was never written.
+    pub fn meta_get(&self, key: &str) -> AppResult<Option<String>> {
+        let conn = self.conn.lock();
+        let v: Option<String> = conn
+            .query_row(
+                "SELECT value FROM sync_meta WHERE key = ?1",
+                params![key],
+                |r| r.get(0),
+            )
+            .ok();
+        Ok(v)
+    }
+
+    /// Write a string value to `sync_meta` (UPSERT).
+    pub fn meta_set(&self, key: &str, value: &str) -> AppResult<()> {
+        let conn = self.conn.lock();
+        conn.execute(
+            "INSERT INTO sync_meta (key, value, updated_at) VALUES (?1, ?2, unixepoch())
+             ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = unixepoch()",
+            params![key, value],
+        )?;
+        Ok(())
+    }
+
+    /// Delete a key from `sync_meta`. No-op if missing.
+    pub fn meta_delete(&self, key: &str) -> AppResult<()> {
+        let conn = self.conn.lock();
+        conn.execute("DELETE FROM sync_meta WHERE key = ?1", params![key])?;
+        Ok(())
+    }
+
+    /// Convenience: read the last-seen `seq` for a (source, session) pair.
+    /// Returns `None` if we have never ingested this session before.
+    pub fn last_seq_for(&self, source_id: &str, native_session_id: &str) -> AppResult<Option<i64>> {
+        let key = format!("source:{source_id}:last_seq:{native_session_id}");
+        match self.meta_get(&key)? {
+            Some(s) => Ok(s.parse::<i64>().ok()),
+            None => Ok(None),
+        }
+    }
+
+    /// Convenience: persist the last-seen `seq` for a (source, session) pair.
+    pub fn set_last_seq(&self, source_id: &str, native_session_id: &str, seq: i64) -> AppResult<()> {
+        let key = format!("source:{source_id}:last_seq:{native_session_id}");
+        self.meta_set(&key, &seq.to_string())
+    }
+
+    /// Insert a batch of events inside a single SQLite transaction.
+    /// Used by the sync engine (Task 5) for backfill ingest. Each
+    /// chunk of up to `batch_size` rows is one `BEGIN .. COMMIT`,
+    /// which is roughly 10× faster than per-row commits on SQLite
+    /// with WAL.
+    ///
+    /// Returns the number of rows that actually landed (i.e. were
+    /// not absorbed by the UNIQUE(session_id, seq) dedupe).
+    ///
+    /// The caller is responsible for ensuring each event's payload is
+    /// already redacted — this method writes whatever it's given.
+    pub fn insert_batch(
+        &self,
+        events: &[crate::sources::CanonicalEvent],
+        batch_size: usize,
+    ) -> AppResult<usize> {
+        if events.is_empty() {
+            return Ok(0);
+        }
+        let batch_size = batch_size.max(1);
+        let mut conn = self.conn.lock();
+        let mut inserted_total = 0usize;
+        for chunk in events.chunks(batch_size) {
+            let tx = conn.transaction()?;
+            for e in chunk {
+                let payload_str = serde_json::to_string(&e.payload)?;
+                // `INSERT OR IGNORE` + UNIQUE(session_id, seq) gives us
+                // idempotent ingest: a replay never blows up.
+                let res = tx.execute(
+                    "INSERT OR IGNORE INTO event (
+                        session_id, seq, occurred_at, kind, payload,
+                        duration_ms, tool_name, tool_input_size, tool_result_size,
+                        cost_usd, tokens_in, tokens_out, model
+                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+                    params![
+                        e.session_id, e.seq, e.occurred_at, e.kind.as_str(), payload_str,
+                        e.duration_ms, e.tool_name, e.tool_input_size, e.tool_result_size,
+                        e.cost_usd, e.tokens_in, e.tokens_out, e.model,
+                    ],
+                );
+                match res {
+                    Ok(0) => { /* ignored — duplicate seq */ }
+                    Ok(_) => inserted_total += 1,
+                    Err(e) => return Err(AppError::Sqlite(e)),
+                }
+            }
+            tx.commit()?;
+        }
+        Ok(inserted_total)
     }
 }
 
