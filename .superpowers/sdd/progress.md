@@ -13,9 +13,9 @@
 | 4 | Canonical types + Source trait + 3 adapters | ✅ done | 720cc30 |
 | 5 | Sync engine + live broadcast | ✅ done | 26a3c9e |
 | 6 | IPC commands (sessions/events/stats/settings) | ✅ done | d7d096c |
-| 7 | Frontend typed API client + live stream hook | 🟡 in-flight (subagents dispatched) | — |
-| 8 | App shell — sidebar, title bar, status bar | ⏳ pending | — |
-| 9 | Overview dashboard — live activity, charts, KPIs | ⏳ pending | — |
+| 7 | Frontend typed API client + live stream hook | ✅ done | da0038a |
+| 8 | App shell — sidebar, title bar, status bar | ✅ done | da0038a |
+| 9 | Overview dashboard — live activity, charts, KPIs | 🟡 in-flight (subagents dispatched) | — |
 | 10 | Sessions list page with filters | ⏳ pending | — |
 | 11 | Session detail — timeline (money shot) | ⏳ pending | — |
 | 12 | Per-agent pages + subagent tree | ⏳ pending | — |
