@@ -9,9 +9,9 @@
 | 0 | Plan written | ✅ done | 58aa2cb |
 | 1 | Bootstrap repo, Tauri scaffold, dev loop | ✅ done | 269e88a |
 | 2 | Global styles, design tokens, glass primitive | ✅ done | 269e88a |
-| 3 | SQLite store, migrations, secret redaction | 🟡 ready (no subagent yet) | — |
-| 4 | Canonical types + Source trait + 3 adapters | 🟡 ready (no subagent yet) | — |
-| 5 | Sync engine + live broadcast | ⏳ pending | — |
+| 3 | SQLite store, migrations, secret redaction | ✅ done | 720cc30 |
+| 4 | Canonical types + Source trait + 3 adapters | ✅ done | 720cc30 |
+| 5 | Sync engine + live broadcast | 🟡 in-flight (subagent dispatched) | — |
 | 6 | IPC commands (sessions/events/stats/settings) | ⏳ pending | — |
 | 7 | Frontend typed API client + live stream hook | ⏳ pending | — |
 | 8 | App shell — sidebar, title bar, status bar | ⏳ pending | — |
