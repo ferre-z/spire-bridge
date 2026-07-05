@@ -18,11 +18,11 @@
 | 9 | Overview dashboard — live activity, charts, KPIs | ✅ done | c0411d1 |
 | 10 | Sessions list page with filters | ✅ done | c0411d1 |
 | 11 | Session detail — timeline (money shot) | ✅ done | c0411d1 |
-| 12 | Per-agent pages + subagent tree | 🟡 in-flight (subagent dispatched) | — |
-| 13 | Cost analytics page | ⏳ pending | — |
-| 14 | Settings + Hermes auth + Claude OTel launcher | ⏳ pending | — |
-| 15 | Polish — animations, transitions, empty states | ⏳ pending | — |
-| 16 | CI, build pipeline, type-gen script | ⏳ pending | — |
+| 12 | Per-agent pages + subagent tree | ✅ done | 012487a |
+| 13 | Cost analytics page | ✅ done | 91a1a57 |
+| 14 | Settings + Hermes auth + Claude OTel launcher | ✅ done | 91a1a57 |
+| 15 | Polish — animations, transitions, empty states | ✅ done | 91a1a57 |
+| 16 | CI, build pipeline, type-gen script | 🟡 in-flight (subagent dispatched) | — |
 | 17 | Deep QA iteration 1 + fix wave | ⏳ pending | — |
 | 18 | Iteration 2 build | ⏳ pending | — |
 | 19 | Phase 2 plan | ⏳ pending | — |
