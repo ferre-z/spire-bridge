@@ -1,0 +1,19 @@
+{
+  "$comment": "Mirrors spire_bridge_lib::sources::EventKind. serde(rename_all = 'snake_case').",
+  "type": "string",
+  "enum": [
+    "user_prompt",
+    "assistant_text",
+    "tool_call",
+    "tool_result",
+    "api_request",
+    "api_error",
+    "api_refusal",
+    "compaction",
+    "auth",
+    "permission_decision",
+    "subagent_start",
+    "subagent_end",
+    "unknown"
+  ]
+}

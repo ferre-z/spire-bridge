@@ -1,0 +1,24 @@
+{
+  "$comment": "Mirrors spire_bridge_lib::store::schema::Event (DB row). Payload is already-redacted JSON text.",
+  "type": "object",
+  "required": [
+    "session_id", "seq", "occurred_at", "kind",
+    "payload", "cost_usd", "tokens_in", "tokens_out"
+  ],
+  "properties": {
+    "id":                { "type": ["integer", "null"] },
+    "session_id":        { "type": "string" },
+    "seq":               { "type": "integer" },
+    "occurred_at":       { "type": "number" },
+    "kind":              { "$ref": "EventKind.canonical.json" },
+    "payload":           { "type": "string" },
+    "duration_ms":       { "type": ["integer", "null"] },
+    "tool_name":         { "type": ["string", "null"] },
+    "tool_input_size":   { "type": ["integer", "null"] },
+    "tool_result_size":  { "type": ["integer", "null"] },
+    "cost_usd":          { "type": "number" },
+    "tokens_in":         { "type": "integer" },
+    "tokens_out":        { "type": "integer" },
+    "model":             { "type": ["string", "null"] }
+  }
+}

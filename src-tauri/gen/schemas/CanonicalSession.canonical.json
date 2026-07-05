@@ -1,0 +1,33 @@
+{
+  "$comment": "Mirrors spire_bridge_lib::sources::CanonicalSession. Regenerate via ./scripts/gen-types.sh after editing the Rust source.",
+  "type": "object",
+  "required": [
+    "id", "source_id", "native_id", "started_at",
+    "input_tokens", "output_tokens", "cache_read", "cache_write",
+    "reasoning_tokens", "cost_usd", "message_count",
+    "tool_call_count", "source_path"
+  ],
+  "properties": {
+    "id":               { "type": "string" },
+    "source_id":        { "type": "string", "description": "One of: 'claude', 'opencode', 'hermes'." },
+    "native_id":        { "type": "string" },
+    "title":            { "type": ["string", "null"] },
+    "project_dir":      { "type": ["string", "null"] },
+    "cwd":              { "type": ["string", "null"] },
+    "git_branch":       { "type": ["string", "null"] },
+    "model":            { "type": ["string", "null"] },
+    "started_at":       { "type": "number", "description": "Unix seconds (f64)." },
+    "ended_at":         { "type": ["number", "null"] },
+    "end_reason":       { "type": ["string", "null"] },
+    "input_tokens":     { "type": "integer" },
+    "output_tokens":    { "type": "integer" },
+    "cache_read":       { "type": "integer" },
+    "cache_write":      { "type": "integer" },
+    "reasoning_tokens": { "type": "integer" },
+    "cost_usd":         { "type": "number" },
+    "message_count":    { "type": "integer" },
+    "tool_call_count":  { "type": "integer" },
+    "parent_session_id":{ "type": ["string", "null"] },
+    "source_path":      { "type": "string", "description": "Original file or URL the session came from." }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$comment": "Mirrors spire_bridge_lib::sources::CanonicalEvent. Regenerate via ./scripts/gen-types.sh after editing the Rust source.",
+  "type": "object",
+  "required": [
+    "session_id", "seq", "occurred_at", "kind",
+    "payload", "cost_usd", "tokens_in", "tokens_out"
+  ],
+  "properties": {
+    "session_id":        { "type": "string" },
+    "seq":               { "type": "integer" },
+    "occurred_at":       { "type": "number", "description": "Unix seconds (f64)." },
+    "kind":              { "$ref": "EventKind.canonical.json" },
+    "payload":           { "description": "Free-form JSON. Source-specific fields preserved verbatim." },
+    "duration_ms":       { "type": ["integer", "null"] },
+    "tool_name":         { "type": ["string", "null"] },
+    "tool_input_size":   { "type": ["integer", "null"] },
+    "tool_result_size":  { "type": ["integer", "null"] },
+    "cost_usd":          { "type": "number" },
+    "tokens_in":         { "type": "integer" },
+    "tokens_out":        { "type": "integer" },
+    "model":             { "type": ["string", "null"] }
+  }
+}
