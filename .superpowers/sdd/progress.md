@@ -15,10 +15,10 @@
 | 6 | IPC commands (sessions/events/stats/settings) | ✅ done | d7d096c |
 | 7 | Frontend typed API client + live stream hook | ✅ done | da0038a |
 | 8 | App shell — sidebar, title bar, status bar | ✅ done | da0038a |
-| 9 | Overview dashboard — live activity, charts, KPIs | 🟡 in-flight (subagents dispatched) | — |
-| 10 | Sessions list page with filters | ⏳ pending | — |
-| 11 | Session detail — timeline (money shot) | ⏳ pending | — |
-| 12 | Per-agent pages + subagent tree | ⏳ pending | — |
+| 9 | Overview dashboard — live activity, charts, KPIs | ✅ done | c0411d1 |
+| 10 | Sessions list page with filters | ✅ done | c0411d1 |
+| 11 | Session detail — timeline (money shot) | ✅ done | c0411d1 |
+| 12 | Per-agent pages + subagent tree | 🟡 in-flight (subagent dispatched) | — |
 | 13 | Cost analytics page | ⏳ pending | — |
 | 14 | Settings + Hermes auth + Claude OTel launcher | ⏳ pending | — |
 | 15 | Polish — animations, transitions, empty states | ⏳ pending | — |
