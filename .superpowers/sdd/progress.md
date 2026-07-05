@@ -22,10 +22,10 @@
 | 13 | Cost analytics page | ✅ done | 91a1a57 |
 | 14 | Settings + Hermes auth + Claude OTel launcher | ✅ done | 91a1a57 |
 | 15 | Polish — animations, transitions, empty states | ✅ done | 91a1a57 |
-| 16 | CI, build pipeline, type-gen script | 🟡 in-flight (subagent dispatched) | — |
-| 17 | Deep QA iteration 1 + fix wave | ⏳ pending | — |
-| 18 | Iteration 2 build | ⏳ pending | — |
-| 19 | Phase 2 plan | ⏳ pending | — |
+| 16 | CI, build pipeline, type-gen script | ✅ done | 919cf04 |
+| 17 | Deep QA iteration 1 + fix wave | ✅ done | bc13cf1 |
+| 18 | Iteration 2 build | ✅ done | bc13cf1 |
+| 19 | Phase 2 plan | ✅ done | bc13cf1 |
 
 ## Conventions
 
