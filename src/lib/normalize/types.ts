@@ -121,6 +121,8 @@ export interface DashboardStats {
 /** UI-side settings. Mirrors the `Settings` struct in Rust. */
 export interface Settings {
   hermes_password_set: boolean;
+  /** Per-source enable/disable flags. UI-only — Rust doesn't enforce yet. */
+  sources: Record<string, boolean>;
 }
 
 /** `stream_live_events` is invoked once to wire the bus; no payload. */

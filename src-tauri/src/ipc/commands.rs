@@ -72,6 +72,44 @@ pub async fn dashboard_stats(
     .map_err(|e| crate::error::AppError::Other(format!("join error: {e}")))?
 }
 
+/// `get_settings()` → UI-shaped Settings (only Hermes password status for now).
+#[tauri::command]
+pub async fn get_settings(
+    state: tauri::State<'_, AppState>,
+) -> AppResult<crate::ipc::Settings> {
+    let secrets = Arc::clone(&state.secrets);
+    tokio::task::spawn_blocking(move || {
+        let hermes_password_set = crate::secrets::hermes_get(&secrets)
+            .map(|opt| opt.is_some())
+            .unwrap_or(false);
+        let mut sources = std::collections::BTreeMap::new();
+        sources.insert("claude".into(), true);
+        sources.insert("opencode".into(), true);
+        sources.insert("hermes".into(), true);
+        Ok(crate::ipc::Settings { hermes_password_set, sources })
+    })
+    .await
+    .map_err(|e| crate::error::AppError::Other(format!("join error: {e}")))?
+}
+
+/// `set_hermes_password(password)` → stores the secret in the OS keychain.
+#[tauri::command]
+pub async fn set_hermes_password(
+    state: tauri::State<'_, AppState>,
+    password: String,
+) -> AppResult<()> {
+    if password.is_empty() {
+        return Err(crate::error::AppError::Other(
+            "password cannot be empty".into(),
+        ));
+    }
+    let secrets = Arc::clone(&state.secrets);
+    tokio::task::spawn_blocking(move || crate::secrets::hermes_set(&secrets, &password))
+        .await
+        .map_err(|e| crate::error::AppError::Other(format!("join error: {e}")))??;
+    Ok(())
+}
+
 #[allow(dead_code)]
 fn _kind_roundtrip(k: &str) -> EventKind {
     EventKind::from_token(k)

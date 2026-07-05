@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 pub mod commands;
-pub use commands::{dashboard_stats, get_session, list_sessions};
+pub use commands::{dashboard_stats, get_session, get_settings, list_sessions, set_hermes_password};
 
 /// Application state injected into every command via `tauri::State<AppState>`.
 ///
@@ -50,4 +50,12 @@ pub struct DashboardStatsLite {
     pub total_cost_usd: f64,
     pub session_count: i64,
     pub error_count: i64,
+}
+
+/// UI-shaped settings payload. Mirrors `Settings` in `src/lib/normalize/types.ts`.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct Settings {
+    pub hermes_password_set: bool,
+    /// Per-source enable flags. Always `true` for now; UI passes through.
+    pub sources: std::collections::BTreeMap<String, bool>,
 }

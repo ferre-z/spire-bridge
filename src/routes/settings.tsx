@@ -22,7 +22,7 @@ const SOURCES = ["claude", "opencode", "hermes"] as const;
 function SettingsPage() {
   const qc = useQueryClient();
   const settingsQuery = useQuery({
-    queryKey: keys.settings,
+    queryKey: keys.settings.current(),
     queryFn: () => api.getSettings(),
     staleTime: 30_000,
   });
@@ -43,7 +43,7 @@ function SettingsPage() {
       await api.setHermesPassword(password);
       setPassword("");
       setSaved(true);
-      qc.invalidateQueries({ queryKey: keys.settings });
+      qc.invalidateQueries({ queryKey: keys.settings.all });
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
       setError(String(e));

@@ -1,5 +1,4 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
 import path from "node:path";
@@ -24,10 +23,5 @@ export default defineConfig({
   build: {
     target: "esnext",
     sourcemap: true,
-  },
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: ["./tests/setup.ts"],
   },
 });

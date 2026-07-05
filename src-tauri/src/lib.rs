@@ -36,6 +36,8 @@ pub fn run() {
             ipc::commands::list_sessions,
             ipc::commands::get_session,
             ipc::commands::dashboard_stats,
+            ipc::commands::get_settings,
+            ipc::commands::set_hermes_password,
         ])
         .setup(move |app| {
                     use tauri::Emitter;
