@@ -20,6 +20,7 @@ use rusqlite::{params, Connection, OptionalExtension};
 use std::path::Path;
 
 pub mod redact;
+pub mod schema;
 
 /// All SQL migrations, in version order. Keep this in sync with the
 /// `migrations/` directory; we read the SQL at compile time so the store
@@ -35,6 +36,26 @@ pub struct Store {
 }
 
 impl Store {
+    /// Borrow the underlying SQLite connection for the duration of `f`.
+    /// The closure runs synchronously; callers wrap it in
+    /// `tokio::task::spawn_blocking` when on the Tauri runtime.
+    ///
+    /// Used by IPC handlers (Task 6) and sync engine helpers that want
+    /// raw `&Connection` access (for `store::schema::*` free functions).
+    pub fn with_conn<R>(
+        &self,
+        f: impl FnOnce(&Connection) -> AppResult<R>,
+    ) -> AppResult<R> {
+        let conn = self.conn.lock();
+        f(&conn)
+    }
+
+    /// Borrow the underlying connection's mutex guard. Used by the IPC
+    /// layer for ad-hoc queries that don't have a helper method yet.
+    pub fn conn_ref(&self) -> parking_lot::MutexGuard<'_, Connection> {
+        self.conn.lock()
+    }
+
     /// Open (or create) the SQLite database at `path` and apply migrations.
     pub fn open(path: impl AsRef<Path>) -> AppResult<Self> {
         let conn = Connection::open(path)?;

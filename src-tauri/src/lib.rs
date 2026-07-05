@@ -9,6 +9,8 @@
 use tracing::info;
 
 pub mod error;
+pub mod ipc;
+pub mod secrets;
 pub mod sources;
 pub mod store;
 pub mod sync;
@@ -30,10 +32,49 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .setup(|_app| {
-            // Updater check deferred to Task 16 (CI/build pipeline) — the
-            // tauri-plugin-updater 2.10 API moved on; revisit when we wire
-            // the public update endpoint and signing keys.
+        .invoke_handler(tauri::generate_handler![
+            ipc::commands::list_sessions,
+            ipc::commands::get_session,
+            ipc::commands::dashboard_stats,
+        ])
+        .setup(|app| {
+            // Build the AppState and stash it for IPC handlers. The actual
+            // sync engine construction (sources + LiveHub + Store) is wired
+            // up here in the Phase 2 cut; for Phase 1 we keep the Store +
+            // LiveHub ready and let the sources be plugged in once the
+            // adapters (Task 4 orphan files) get wired.
+            use tauri::Manager;
+            let data_dir = app
+                .path()
+                .app_data_dir()
+                .unwrap_or_else(|_| std::path::PathBuf::from("."));
+            let db_path = data_dir.join("spire.db");
+            if let Some(parent) = db_path.parent() {
+                let _ = std::fs::create_dir_all(parent);
+            }
+            let store = match store::Store::open(&db_path) {
+                Ok(s) => std::sync::Arc::new(s),
+                Err(e) => {
+                    tracing::warn!(error = %e, "store open failed; running with empty state");
+                    // No public in-memory Store API outside tests; open a
+                    // throwaway file in tmpdir as a fallback so the IPC
+                    // layer can still respond.
+                    let fallback = std::env::temp_dir().join("spire-fallback.db");
+                    std::sync::Arc::new(
+                        store::Store::open(&fallback)
+                            .expect("fallback store open"),
+                    )
+                }
+            };
+            let live = std::sync::Arc::new(sync::live::LiveHub::new());
+            let keyring: secrets::SharedSecretStore =
+                std::sync::Arc::new(secrets::SystemKeyring);
+            app.manage(ipc::AppState {
+                store,
+                live,
+                secrets: keyring,
+            });
+            info!("AppState registered; commands live");
             Ok(())
         })
         .run(tauri::generate_context!())

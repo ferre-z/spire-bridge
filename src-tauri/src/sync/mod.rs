@@ -25,6 +25,9 @@
 
 pub mod backfill;
 pub mod live;
+// LiveHub is intentionally NOT re-exported here. It's used internally
+// via `crate::sync::live::LiveHub`; consumers outside `sync` should
+// import from `crate::sync::LiveHub` through `live::LiveHub` directly.
 
 use crate::error::{AppError, AppResult};
 use crate::sources::Source;
