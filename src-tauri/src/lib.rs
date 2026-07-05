@@ -37,7 +37,9 @@ pub fn run() {
             ipc::commands::get_session,
             ipc::commands::dashboard_stats,
         ])
-        .setup(|app| {
+        .setup(move |app| {
+                    use tauri::Emitter;
+
             // Build the AppState and stash it for IPC handlers. The actual
             // sync engine construction (sources + LiveHub + Store) is wired
             // up here in the Phase 2 cut; for Phase 1 we keep the Store +
@@ -71,8 +73,20 @@ pub fn run() {
                 std::sync::Arc::new(secrets::SystemKeyring);
             app.manage(ipc::AppState {
                 store,
-                live,
+                live: live.clone(),
                 secrets: keyring,
+            });
+            // Forward every canonical event published to LiveHub
+            // out to the renderer over Tauri IPC. The renderer
+            // subscribes via `listen("bridge://event", cb)`.
+            let handle = app.handle().clone();
+            let mut rx = live.subscribe();
+            tokio::spawn(async move {
+                while let Ok(ev) = rx.recv().await {
+                    if let Err(e) = handle.emit("bridge://event", &ev) {
+                        tracing::warn!(error = %e, "event emit failed");
+                    }
+                }
             });
             info!("AppState registered; commands live");
             Ok(())

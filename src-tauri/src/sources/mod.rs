@@ -127,46 +127,6 @@ pub trait Source: Send + Sync {
     async fn live_events(&self) -> Result<mpsc::Receiver<CanonicalEvent>, SourceError>;
 }
 
-// --- Stub adapter placeholders. Real implementations land in Tasks 4.1–4.6
-// once each source's wire format is pinned down with fixture-based tests.
-
-pub struct ClaudeSource;
-pub struct OpenCodeSource;
-pub struct HermesSource;
-
-#[async_trait]
-impl Source for ClaudeSource {
-    fn id(&self) -> &'static str { "claude" }
-    async fn health(&self) -> Result<(), SourceError> { Ok(()) }
-    async fn backfill(&self, _since: Option<f64>) -> Result<Vec<(CanonicalSession, Vec<CanonicalEvent>)>, SourceError> { Ok(Vec::new()) }
-    async fn live_events(&self) -> Result<mpsc::Receiver<CanonicalEvent>, SourceError> {
-        let (_tx, rx) = mpsc::channel(1);
-        Ok(rx)
-    }
-}
-
-#[async_trait]
-impl Source for OpenCodeSource {
-    fn id(&self) -> &'static str { "opencode" }
-    async fn health(&self) -> Result<(), SourceError> { Ok(()) }
-    async fn backfill(&self, _since: Option<f64>) -> Result<Vec<(CanonicalSession, Vec<CanonicalEvent>)>, SourceError> { Ok(Vec::new()) }
-    async fn live_events(&self) -> Result<mpsc::Receiver<CanonicalEvent>, SourceError> {
-        let (_tx, rx) = mpsc::channel(1);
-        Ok(rx)
-    }
-}
-
-#[async_trait]
-impl Source for HermesSource {
-    fn id(&self) -> &'static str { "hermes" }
-    async fn health(&self) -> Result<(), SourceError> { Ok(()) }
-    async fn backfill(&self, _since: Option<f64>) -> Result<Vec<(CanonicalSession, Vec<CanonicalEvent>)>, SourceError> { Ok(Vec::new()) }
-    async fn live_events(&self) -> Result<mpsc::Receiver<CanonicalEvent>, SourceError> {
-        let (_tx, rx) = mpsc::channel(1);
-        Ok(rx)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
